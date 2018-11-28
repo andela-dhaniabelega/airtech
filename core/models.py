@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
 
 
 class Flight(models.Model):
@@ -27,25 +28,25 @@ class Flight(models.Model):
     )
 
 
-class CustomUser(AbstractUser):
-    email = models.EmailField(max_length=300)
-    password = models.CharField(max_length=200)
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
-    age = models.CharField(max_length=50)
+class User(AbstractUser):
+    date_of_birth = models.DateField(max_length=200, blank=True, null=True)
     photo = models.CharField(max_length=300, blank=True, null=True)
 
     def __str__(self):
         return self.email
 
 
+# Get custom model
+UserModel = get_user_model()
+
+
 class Ticket(models.Model):
     PURCHASED = 'PD'
     RESERVED = 'RD'
     FLIGHT_STATUS_CHOICES = (
-        (PURCHASED, 'Purcahsed'),
+        (PURCHASED, 'Purchased'),
         (RESERVED, 'Reserved'),
     )
     flight_details = models.ForeignKey(Flight, on_delete=models.CASCADE)
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    owner = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     status = models.CharField(max_length=200)
