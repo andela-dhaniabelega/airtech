@@ -1,3 +1,6 @@
+import re
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import get_user_model
@@ -34,6 +37,19 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    def clean(self):
+        password_pattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
+        if self.password and not re.match(password_pattern, self.password):
+            raise ValidationError(
+                "Password must contain at least: "
+                "1 upper case letter, 1 lower case letter, 1 special character, 1 digit "
+                "and have a minimum 8 characters")
+
+        email_pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}" \
+                        "[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+        if self.email and not re.match(email_pattern, self.email):
+            raise ValidationError("Invalid Email")
 
 
 # Get custom model
