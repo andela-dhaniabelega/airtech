@@ -1,0 +1,4 @@
+.virtualenv/
+!.idea/
+.idea/*
+!.idea/runConfigurations
