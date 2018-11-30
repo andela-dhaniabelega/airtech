@@ -11,5 +11,5 @@ urlpatterns = [
     # path('ticket/<int:flight_id>/reserve', views.index, name='index'),
     path('user/login', views.UserLogin.as_view()),
     path('user/create', views.UserCreate.as_view()),
-    # path('user/<int:user_id>/upload_photo', views.index, name='index'),
+    path('user/<int:user_id>/upload_photo', views.PhotoUpdateDestroy.as_view()),
 ]

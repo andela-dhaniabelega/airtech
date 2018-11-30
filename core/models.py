@@ -5,6 +5,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import get_user_model
 
+from airtech.settings import DEFAULT_IMAGE
+
 
 class Flight(models.Model):
     BOARDING = 'BO'
@@ -33,7 +35,7 @@ class Flight(models.Model):
 
 class User(AbstractUser):
     date_of_birth = models.DateField(max_length=200, blank=True, null=True)
-    photo = models.CharField(max_length=300, blank=True, null=True)
+    photo = models.ImageField(upload_to='Uploads/', default=DEFAULT_IMAGE)
 
     def __str__(self):
         return self.email
