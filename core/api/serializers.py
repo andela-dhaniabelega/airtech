@@ -61,3 +61,11 @@ class UserLoginSerializer(serializers.Serializer):
         else:
             msg = 'Username and Password are required'
             raise serializers.ValidationError(msg)
+
+
+class PhotoUploadSerializer(serializers.ModelSerializer):
+    photo = serializers.ImageField(max_length=None, use_url=True)
+
+    class Meta:
+        model = User
+        fields = ('photo',)
