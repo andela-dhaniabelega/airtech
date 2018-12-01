@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from core.forms import CreateUserForm, ChangeUserForm
-from core.models import User
+from core.models import User, Flight, Ticket
 
 
 class CustomUserAdmin(UserAdmin):
@@ -20,3 +20,5 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(Flight)
+admin.site.register(Ticket)
