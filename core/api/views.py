@@ -1,3 +1,4 @@
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import parsers, status, generics
@@ -10,6 +11,22 @@ from core.utils import get_single_object
 from airtech.settings import DEFAULT_IMAGE
 
 User = get_user_model()
+
+
+@api_view(['GET'])
+def check_flight_status(request, flight_id):
+    flight = Flight.objects.get(pk=flight_id)
+    return Response({'status': flight.status}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def check_flight_reservations(request):
+    date = request.data['date']
+    day = date.split('-')[2]
+    flight_number = request.data['flight_number']
+    reservations = Ticket.objects.filter(
+        flight_details__flight_number__exact=flight_number, date_created__day=day).count()
+    return Response({'reservations': reservations}, status=status.HTTP_200_OK)
 
 
 class UserCreate(APIView):
@@ -76,7 +93,7 @@ class FlightDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FlightSerializer
 
 
-class TicketPurchaseList(generics.ListCreateAPIView):
+class TicketList(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
@@ -84,3 +101,7 @@ class TicketPurchaseList(generics.ListCreateAPIView):
 class TicketDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+
+
+
+

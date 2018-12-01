@@ -19,6 +19,7 @@ class Flight(models.Model):
         (GOTOGATE, 'Go To Gate'),
         (ONTIME, 'OT')
     )
+    flight_number = models.CharField(max_length=100, unique=True)
     depature_time = models.TimeField(max_length=50)
     depature_date = models.DateField(max_length=50)
     depature_city = models.CharField(max_length=150)
@@ -31,6 +32,9 @@ class Flight(models.Model):
         choices=FLIGHT_STATUS_CHOICES,
         default=ONTIME
     )
+
+    def __str__(self):
+        return self.flight_number
 
 
 class User(AbstractUser):
@@ -68,3 +72,7 @@ class Ticket(models.Model):
     flight_details = models.ForeignKey(Flight, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     ticket_status = models.CharField(max_length=200, choices=FLIGHT_STATUS_CHOICES)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.id)
