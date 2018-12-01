@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 
+from core.models import Flight, Ticket
 from core.utils import ExtendedEncoder
 
 User = get_user_model()
@@ -69,3 +70,17 @@ class PhotoUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('photo',)
+
+
+class FlightSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Flight
+        fields = '__all__'
+
+
+class TicketSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ticket
+        fields = ('flight_details', 'owner', 'ticket_status')

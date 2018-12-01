@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import parsers, status
+from rest_framework import parsers, status, generics
 from django.contrib.auth import get_user_model
 
-from core.api.serializers import UserCreateSerializer, UserLoginSerializer, PhotoUploadSerializer
+from core.api.serializers import UserCreateSerializer, UserLoginSerializer, PhotoUploadSerializer, FlightSerializer, \
+    TicketSerializer
+from core.models import Ticket, Flight
 from core.utils import get_single_object
 from airtech.settings import DEFAULT_IMAGE
 
@@ -44,15 +46,41 @@ class PhotoUpdateDestroy(APIView):
     def put(self, request, user_id, format=None):
         parser_classes = (parsers.MultiPartParser, parsers.FormParser)
         user = get_single_object(user_id, User)
-        serializer = PhotoUploadSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        if user is not None:
+            serializer = PhotoUploadSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, user_id, format=None):
         user = get_single_object(user_id, User)
-        setattr(user, 'photo', DEFAULT_IMAGE)
-        user.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if user is not None:
+            setattr(user, 'photo', DEFAULT_IMAGE)
+            user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class FlightList(generics.ListCreateAPIView):
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
+
+
+class FlightDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
+
+
+class TicketPurchaseList(generics.ListCreateAPIView):
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer
+
+
+class TicketDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer

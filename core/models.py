@@ -19,12 +19,12 @@ class Flight(models.Model):
         (GOTOGATE, 'Go To Gate'),
         (ONTIME, 'OT')
     )
-    depature_time = models.TimeField()
-    depature_date = models.DateField()
-    depature_city = models.CharField(max_length=200)
-    arrival_time = models.TimeField()
-    arrival_date = models.DateField()
-    arrival_city = models.CharField(max_length=200)
+    depature_time = models.TimeField(max_length=50)
+    depature_date = models.DateField(max_length=50)
+    depature_city = models.CharField(max_length=150)
+    arrival_time = models.TimeField(max_length=50)
+    arrival_date = models.DateField(max_length=50)
+    arrival_city = models.CharField(max_length=150)
     price = models.CharField(max_length=200)
     status = models.CharField(
         max_length=3,
@@ -67,4 +67,4 @@ class Ticket(models.Model):
     )
     flight_details = models.ForeignKey(Flight, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    status = models.CharField(max_length=200)
+    ticket_status = models.CharField(max_length=200, choices=FLIGHT_STATUS_CHOICES)
