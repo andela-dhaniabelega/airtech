@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
+from rest_framework_jwt.settings import api_settings
 
 from core.models import Flight, Ticket
-from core.utils import ExtendedEncoder
 
 User = get_user_model()
+jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -38,6 +40,7 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
+
         credentials = {
             'username': attrs.get('username'),
             'password': attrs.get('password')
@@ -51,10 +54,11 @@ class UserLoginSerializer(serializers.Serializer):
                     msg = 'User account disabled'
                     raise serializers.ValidationError(msg)
 
-                # TODO: Add Token Based Authentication in Output 6.3
-                serialized_user = ExtendedEncoder().default(user)
+                payload = jwt_payload_handler(user)
+                token = jwt_encode_handler(payload)
                 return {
-                    'user': serialized_user
+                    'user': payload,
+                    'token': token
                 }
             else:
                 msg = 'Incorrect username or password'

@@ -1,8 +1,10 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import parsers, status, generics
 from django.contrib.auth import get_user_model
+from rest_framework_jwt.settings import api_settings
 
 from core.api.serializers import UserCreateSerializer, UserLoginSerializer, PhotoUploadSerializer, FlightSerializer, \
     TicketSerializer
@@ -15,6 +17,7 @@ User = get_user_model()
 
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def check_flight_status(request, flight_id):
     """
     Returns the status of a flight
@@ -27,6 +30,7 @@ def check_flight_status(request, flight_id):
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def check_flight_reservations(request):
     """
     Computes and returns the number of reservations for a flight
@@ -51,8 +55,16 @@ class UserCreate(APIView):
     def post(self, request, format=None):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+            user = serializer.save()
+            payload = jwt_payload_handler(user)
+            token = jwt_encode_handler(payload)
+            data = {
+                'user': serializer.data,
+                'token': token
+            }
+            return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -76,6 +88,7 @@ class PhotoUpdateDestroy(APIView):
     Since photo upload is handled separately from when a user is created, uploading and
     updating will be a PUT
     """
+    permission_classes = [IsAuthenticated, ]
 
     def put(self, request, user_id, format=None):
         parser_classes = (parsers.MultiPartParser, parsers.FormParser)
@@ -106,6 +119,7 @@ class FlightList(generics.ListCreateAPIView):
     """
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
+    permission_classes = [IsAuthenticated, ]
 
 
 class FlightDetails(generics.RetrieveUpdateDestroyAPIView):
@@ -114,6 +128,7 @@ class FlightDetails(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
+    permission_classes = [IsAuthenticated, ]
 
 
 class TicketList(generics.ListCreateAPIView):
@@ -123,6 +138,7 @@ class TicketList(generics.ListCreateAPIView):
     """
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = [IsAuthenticated, ]
 
     def perform_create(self, serializer):
         ticket = serializer.save()
@@ -144,3 +160,4 @@ class TicketDetails(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = [IsAuthenticated, ]
