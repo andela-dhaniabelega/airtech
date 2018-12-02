@@ -139,10 +139,11 @@ DEFAULT_IMAGE = 'Uploads/avatar.png'
 # CELERY SETTINGS
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_TIMEZONE = 'Africa/Lagos'
+CELERY_IMPORTS = ("core.tasks", )
 CELERY_BEAT_SCHEDULE = {
     'send-notification-everyday-at-6pm': {
-        'task': 'core.tasks.send_flight_reminder_email_task',
-        'schedule': crontab(minute='*/2'),
+        'task': 'Send Flight Reminder',
+        'schedule': crontab(minute=0, hour=18),
     },
 }
 

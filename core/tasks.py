@@ -12,7 +12,7 @@ logger = get_task_logger(__name__)
 @task(name='Send Flight Reminder')
 def send_flight_reminder_email_task():
     """
-    Sends email to remind customers a day before their flight
+    Sends reminder email a day before user's their flight
     :return:
     """
     flight_date = datetime.now() + timedelta(days=1)
@@ -33,7 +33,7 @@ def send_flight_reminder_email_task():
 @task(name='Send Initial Ticket')
 def send_initial_ticket_email_task(**kwargs):
     """
-    Sends email to remind customers a day before their flight
+    Sends newly purchased ticket to user
     :return:
     """
     logger.info("Sent Initial Ticket")

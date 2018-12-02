@@ -16,12 +16,23 @@ User = get_user_model()
 
 @api_view(['GET'])
 def check_flight_status(request, flight_id):
+    """
+    Returns the status of a flight
+    :param request:
+    :param flight_id:
+    :return:
+    """
     flight = Flight.objects.get(pk=flight_id)
     return Response({'status': flight.status}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def check_flight_reservations(request):
+    """
+    Computes and returns the number of reservations for a flight
+    :param request:
+    :return:
+    """
     date = request.data['date']
     day = date.split('-')[2]
     flight_number = request.data['flight_number']
@@ -61,7 +72,9 @@ class UserLogin(APIView):
 
 class PhotoUpdateDestroy(APIView):
     """
-    Handles Photo Upload (and Update) and Deletion
+    Handles Photo Upload (and Update) and Deletion.
+    Since photo upload is handled separately from when a user is created, uploading and
+    updating will be a PUT
     """
 
     def put(self, request, user_id, format=None):
@@ -88,16 +101,26 @@ class PhotoUpdateDestroy(APIView):
 
 
 class FlightList(generics.ListCreateAPIView):
+    """
+    Create New Flight or List Existing Flights
+    """
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
 
 
 class FlightDetails(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, Update or Destroy a given flight
+    """
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
 
 
 class TicketList(generics.ListCreateAPIView):
+    """
+    Create New Ticket or List Existing Tickets.
+    Send email to user with newly created ticket
+    """
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
@@ -116,5 +139,8 @@ class TicketList(generics.ListCreateAPIView):
 
 
 class TicketDetails(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, Update or Destroy a given flight
+    """
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
