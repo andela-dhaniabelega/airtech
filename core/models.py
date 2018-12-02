@@ -57,6 +57,8 @@ class User(AbstractUser):
                         "[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
         if self.email and not re.match(email_pattern, self.email):
             raise ValidationError("Invalid Email")
+        if self.photo is not None and self.photo.size > 5242880:
+            raise ValidationError("Image Too Large. Max. size is 5MB")
 
 
 # Get custom model
