@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from core.api.serializers import UserCreateSerializer, UserLoginSerializer, PhotoUploadSerializer, FlightSerializer, \
     TicketSerializer
 from core.models import Ticket, Flight
+from core.tasks import send_initial_ticket_email_task
 from core.utils import get_single_object
 from airtech.settings import DEFAULT_IMAGE
 
@@ -35,6 +36,7 @@ class UserCreate(APIView):
     :param
     :return
     """
+
     def post(self, request, format=None):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -48,6 +50,7 @@ class UserLogin(APIView):
     """
     Implements User Login
     """
+
     def post(self, request, format=None):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -60,6 +63,7 @@ class PhotoUpdateDestroy(APIView):
     """
     Handles Photo Upload (and Update) and Deletion
     """
+
     def put(self, request, user_id, format=None):
         parser_classes = (parsers.MultiPartParser, parsers.FormParser)
         user = get_single_object(user_id, User)
@@ -97,11 +101,20 @@ class TicketList(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
+    def perform_create(self, serializer):
+        ticket = serializer.save()
+        kwargs = {
+            "departure_city": ticket.flight_details.depature_city,
+            "departure_time": ticket.flight_details.depature_time,
+            "departure_date": ticket.flight_details.depature_date,
+            "arrival_city": ticket.flight_details.arrival_city,
+            "arrival_time": ticket.flight_details.arrival_time,
+            "arrival_date": ticket.flight_details.arrival_date,
+            "email": ticket.owner.email
+        }
+        send_initial_ticket_email_task.delay(**kwargs)
+
 
 class TicketDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-
-
-
-

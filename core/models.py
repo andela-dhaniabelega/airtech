@@ -27,6 +27,7 @@ class Flight(models.Model):
     arrival_date = models.DateField(max_length=50)
     arrival_city = models.CharField(max_length=150)
     price = models.CharField(max_length=200)
+    gate = models.CharField(max_length=50, default="TBD")
     status = models.CharField(
         max_length=3,
         choices=FLIGHT_STATUS_CHOICES,
