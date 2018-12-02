@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from celery.schedules import crontab
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -133,3 +135,22 @@ AUTH_USER_MODEL = 'core.User'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 DEFAULT_IMAGE = 'Uploads/avatar.png'
+
+# CELERY SETTINGS
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_TIMEZONE = 'Africa/Lagos'
+CELERY_IMPORTS = ("core.tasks", )
+CELERY_BEAT_SCHEDULE = {
+    'send-notification-everyday-at-6pm': {
+        'task': 'Send Flight Reminder',
+        'schedule': crontab(minute=0, hour=18),
+    },
+}
+
+# EMAIL SETTINGS
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'ckan.socialite@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')

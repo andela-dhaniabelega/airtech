@@ -65,6 +65,9 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class PhotoUploadSerializer(serializers.ModelSerializer):
+    """
+    Serializer to handle photo upload
+    """
     photo = serializers.ImageField(max_length=None, use_url=True)
 
     class Meta:
@@ -73,14 +76,18 @@ class PhotoUploadSerializer(serializers.ModelSerializer):
 
 
 class FlightSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer to handle all CRUD operations on Flights
+    """
     class Meta:
         model = Flight
         fields = '__all__'
 
 
 class TicketSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer to handle all CRUD Operations on Tickets
+    """
     class Meta:
         model = Ticket
         fields = ('flight_details', 'owner', 'ticket_status')
