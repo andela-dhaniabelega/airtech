@@ -18,14 +18,14 @@ User = get_user_model()
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
-def check_flight_status(request, flight_id):
+def check_flight_status(request, pk):
     """
     Returns the status of a flight
     :param request:
-    :param flight_id:
+    :param pk:
     :return:
     """
-    flight = Flight.objects.get(pk=flight_id)
+    flight = Flight.objects.get(pk=pk)
     return Response({'status': flight.status}, status=status.HTTP_200_OK)
 
 
@@ -33,7 +33,7 @@ def check_flight_status(request, flight_id):
 @permission_classes((IsAuthenticated,))
 def check_flight_reservations(request):
     """
-    Computes and returns the number of reservations for a flight
+    Computes and returns the number of reservations for a flight on a particular day
     :param request:
     :return:
     """
@@ -51,6 +51,7 @@ class UserCreate(APIView):
     :param
     :return
     """
+    permission_classes = []
 
     def post(self, request, format=None):
         serializer = UserCreateSerializer(data=request.data)
@@ -73,6 +74,7 @@ class UserLogin(APIView):
     """
     Implements User Login
     """
+    permission_classes = []
 
     def post(self, request, format=None):
         serializer = UserLoginSerializer(data=request.data)
@@ -90,9 +92,9 @@ class PhotoUpdateDestroy(APIView):
     """
     permission_classes = [IsAuthenticated, ]
 
-    def put(self, request, user_id, format=None):
+    def put(self, request, pk, format=None):
         parser_classes = (parsers.MultiPartParser, parsers.FormParser)
-        user = get_single_object(user_id, User)
+        user = get_single_object(pk, User)
         if user is not None:
             serializer = PhotoUploadSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
@@ -103,8 +105,8 @@ class PhotoUpdateDestroy(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, user_id, format=None):
-        user = get_single_object(user_id, User)
+    def delete(self, request, pk, format=None):
+        user = get_single_object(pk, User)
         if user is not None:
             setattr(user, 'photo', DEFAULT_IMAGE)
             user.save()

@@ -1,0 +1,16 @@
+[run]
+branch = True
+omit =
+    */.virtualenv/*
+    */tests/*
+    */migrations/*
+    */tests.py
+    */__init__.py
+    */manage.py
+    */wsgi.py
+    */urls.py
+    */settings.py
+    */celery.py
+    */test_utils.py
+source =
+    .
